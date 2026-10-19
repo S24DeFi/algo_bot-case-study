@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg style="background:#0b1a2b" viewBox="0 0 960 330" role="img" aria-labelledby="archT archD" xmlns="http://www.w3.org/2000/svg">
+        <title id="archT">Trading path architecture</title>
+        <desc id="archD">Market data flows into signals and strategies, then a risk layer, then execution through a broker factory, then an append-only audit and trade ledger. A command center and observability stack watch every stage, and a kill switch can stop risk and execution.</desc>
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#e6b85c"/></marker></defs>
+        <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" text-anchor="middle">
+          <g fill="#132c47" stroke="#22415f" stroke-width="1.5">
+            <rect x="10" y="40" width="160" height="96" rx="12"/>
+            <rect x="200" y="40" width="160" height="96" rx="12"/>
+            <rect x="390" y="40" width="160" height="96" rx="12" stroke="#e6b85c"/>
+            <rect x="580" y="40" width="160" height="96" rx="12"/>
+            <rect x="770" y="40" width="180" height="96" rx="12"/>
+          </g>
+          <g fill="#eef4fa" font-size="17" font-weight="700">
+            <text x="90" y="80">Market data</text>
+            <text x="280" y="80">Signals</text>
+            <text x="470" y="80">Risk layer</text>
+            <text x="660" y="80">Execution</text>
+            <text x="860" y="80">Ledger + audit</text>
+          </g>
+          <g fill="#a9bccf" font-size="13">
+            <text x="90" y="104">brokers, history,</text><text x="90" y="121">market calendars</text>
+            <text x="280" y="104">strategies, regime,</text><text x="280" y="121">optional LLM score</text>
+            <text x="470" y="104">limits, order safety,</text><text x="470" y="121">drawdown tiers</text>
+            <text x="660" y="104">broker factory,</text><text x="660" y="121">fees + slippage</text>
+            <text x="860" y="104">append-only,</text><text x="860" y="121">hash-chained</text>
+          </g>
+          <g stroke="#e6b85c" stroke-width="2" marker-end="url(#ar)">
+            <line x1="172" y1="88" x2="196" y2="88"/><line x1="362" y1="88" x2="386" y2="88"/>
+            <line x1="552" y1="88" x2="576" y2="88"/><line x1="742" y1="88" x2="766" y2="88"/>
+          </g>
+          <rect x="390" y="196" width="160" height="56" rx="10" fill="#3a1f24" stroke="#ef6a5e" stroke-width="1.5"/>
+          <text x="470" y="221" fill="#eef4fa" font-size="16" font-weight="700">Kill switch</text>
+          <text x="470" y="240" fill="#f3b3ab" font-size="13">4 separate triggers</text>
+          <g stroke="#ef6a5e" stroke-width="2" marker-end="url(#ar)" fill="none">
+            <path d="M470,194 L470,140"/><path d="M552,224 L660,224 L660,140"/>
+          </g>
+          <rect x="10" y="276" width="940" height="44" rx="10" fill="#10243a" stroke="#22415f" stroke-width="1.5"/>
+          <text x="480" y="304" fill="#a9bccf" font-size="14">Command center (token-protected) · Prometheus · Grafana · Alertmanager · Slack and pager alerts</text>
+        </g>
+      </svg>

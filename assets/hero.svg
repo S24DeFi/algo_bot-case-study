@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" width="1000" height="300" role="img" aria-labelledby="t d">
+  <title id="t">algo_bot case study</title>
+  <desc id="d">algo_bot: an autonomous trading platform that is safe by default and built so it can't fool itself. Case study by Andre Spencer, lead engineer, built under S24DeFi Labs.</desc>
+  <defs>
+    <radialGradient id="glow" cx="85%" cy="0%" r="70%">
+      <stop offset="0" stop-color="#1d4a73"/><stop offset="1" stop-color="#0b1a2b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rule" x1="0" x2="1"><stop offset="0" stop-color="#e6b85c"/><stop offset="1" stop-color="#e6b85c" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="1000" height="300" rx="18" fill="#0b1a2b"/>
+  <rect width="1000" height="300" rx="18" fill="url(#glow)"/>
+  <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif">
+    <text x="56" y="70" fill="#e6b85c" font-size="15" font-weight="700" letter-spacing="2.5">CASE STUDY · BUILT UNDER S24DEFI LABS</text>
+    <text x="54" y="140" fill="#eef4fa" font-size="64" font-weight="800">algo_bot</text>
+    <text x="56" y="180" fill="#eef4fa" font-size="25" font-weight="700">An autonomous trading platform that's</text>
+    <text x="56" y="210" fill="#eef4fa" font-size="25" font-weight="700"><tspan fill="#e6b85c">safe by default</tspan>, and built so it can't</text>
+    <text x="56" y="240" fill="#eef4fa" font-size="25" font-weight="700">fool itself.</text>
+    <rect x="56" y="256" width="420" height="2" fill="url(#rule)"/>
+    <text x="56" y="284" fill="#a9bccf" font-size="16"><tspan fill="#eef4fa" font-weight="700">Andre Spencer</tspan> · Lead engineer · Nov 2025 to present</text>
+  </g>
+  <g transform="translate(716,80)" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" text-anchor="middle">
+    <g fill="#132c47" stroke="#22415f" stroke-width="1.5">
+      <rect x="0" y="0" width="120" height="40" rx="9"/><rect x="140" y="0" width="120" height="40" rx="9"/>
+      <rect x="0" y="62" width="120" height="40" rx="9" stroke="#e6b85c"/><rect x="140" y="62" width="120" height="40" rx="9"/>
+      <rect x="70" y="124" width="120" height="40" rx="9" fill="#3a1f24" stroke="#ef6a5e"/>
+    </g>
+    <g fill="#eef4fa" font-size="14" font-weight="700">
+      <text x="60" y="25">Signals</text><text x="200" y="25">Research</text>
+      <text x="60" y="87">Risk</text><text x="200" y="87">Execution</text>
+      <text x="130" y="149">Kill switch</text>
+    </g>
+    <g stroke="#e6b85c" stroke-width="1.6" fill="none">
+      <path d="M60,42 L60,58"/><path d="M122,82 L136,82"/><path d="M200,42 L200,58"/>
+    </g>
+    <g stroke="#ef6a5e" stroke-width="1.6" fill="none"><path d="M100,122 L80,104"/><path d="M160,122 L180,104"/></g>
+  </g>
+</svg>

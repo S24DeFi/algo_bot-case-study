@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg style="background:#0b1a2b" viewBox="0 0 960 250" role="img" aria-labelledby="rsT rsD" xmlns="http://www.w3.org/2000/svg">
+        <title id="rsT">Research pipeline</title>
+        <desc id="rsD">An idea passes through pre-registration, adversarial review, return-free preflight, the lookahead guard, walk-forward out-of-sample testing and the Deflated Sharpe test. Failures at the early stages cost no ledger trials; every failure is recorded.</desc>
+        <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#e6b85c"/></marker></defs>
+        <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" text-anchor="middle">
+          <g fill="#132c47" stroke="#22415f" stroke-width="1.5">
+            <rect x="6" y="30" width="138" height="90" rx="12"/><rect x="164" y="30" width="138" height="90" rx="12"/>
+            <rect x="322" y="30" width="138" height="90" rx="12"/><rect x="480" y="30" width="138" height="90" rx="12"/>
+            <rect x="638" y="30" width="138" height="90" rx="12"/><rect x="796" y="30" width="158" height="90" rx="12" stroke="#e6b85c"/>
+          </g>
+          <g fill="#eef4fa" font-size="15" font-weight="700">
+            <text x="75" y="68">Pre-register</text><text x="233" y="68">Adversarial</text><text x="391" y="68">Return-free</text>
+            <text x="549" y="68">Lookahead</text><text x="707" y="68">Walk-forward</text><text x="875" y="68">Deflated</text>
+          </g>
+          <g fill="#eef4fa" font-size="15" font-weight="700">
+            <text x="233" y="86">review</text><text x="391" y="86">preflight</text><text x="549" y="86">guard</text><text x="707" y="86">out-of-sample</text><text x="875" y="86">Sharpe test</text>
+          </g>
+          <g fill="#a9bccf" font-size="12">
+            <text x="75" y="88">hypothesis, sign,</text><text x="75" y="104">horizon, prior</text>
+            <text x="233" y="106">attack the claim</text><text x="391" y="106">kill for $0</text>
+            <text x="549" y="106">no future data</text><text x="707" y="106">frozen, no fitting</text><text x="875" y="106">bar rises per trial</text>
+          </g>
+          <g stroke="#e6b85c" stroke-width="2" marker-end="url(#ar2)">
+            <line x1="146" y1="75" x2="160" y2="75"/><line x1="304" y1="75" x2="318" y2="75"/><line x1="462" y1="75" x2="476" y2="75"/>
+            <line x1="620" y1="75" x2="634" y2="75"/><line x1="778" y1="75" x2="792" y2="75"/>
+          </g>
+          <rect x="6" y="160" width="454" height="70" rx="10" fill="#10243a" stroke="#22415f"/>
+          <text x="233" y="190" fill="#eef4fa" font-size="15" font-weight="700">Cheap kills</text>
+          <text x="233" y="211" fill="#a9bccf" font-size="13">No returns loaded. No ledger trial spent.</text>
+          <rect x="480" y="160" width="474" height="70" rx="10" fill="#10243a" stroke="#22415f"/>
+          <text x="717" y="190" fill="#eef4fa" font-size="15" font-weight="700">Counted trials</text>
+          <text x="717" y="211" fill="#a9bccf" font-size="13">Every run is charged to a permanent ledger. Nothing is deleted.</text>
+        </g>
+      </svg>

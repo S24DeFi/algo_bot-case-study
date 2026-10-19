@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>algo_bot case study · S24DeFi Labs</title>
+<meta name="description" content="How we built an autonomous trading platform that is safe by default and engineered so it can't fool itself. Architecture, safety design and research rigor, without the code.">
+<meta property="og:title" content="algo_bot: safe by default, built so it can't fool itself">
+<meta property="og:description" content="Case study of an autonomous trading platform built under S24DeFi Labs: independent safety stops, a research bar that rises with every idea tried, and AI agents working under rules written in code.">
+<meta property="og:image" content="https://s24defi.github.io/algo_bot-case-study/assets/og.png">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{
+  --bg:#0b1a2b; --panel:#10243a; --panel2:#132c47; --line:#22415f;
+  --ink:#eef4fa; --muted:#a9bccf; --gold:#e6b85c; --green:#61c454; --red:#ef6a5e;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif;font-variant-ligatures:none}
+a{color:var(--gold)}
+a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+header.hero{padding:72px 0 48px;border-bottom:1px solid var(--line);background:radial-gradient(1200px 400px at 80% -10%,#173a5c 0,transparent 60%)}
+.kicker{color:var(--gold);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px}
+h1{font-size:clamp(32px,6vw,54px);line-height:1.08;margin:14px 0 18px;letter-spacing:-.01em}
+h1 span{color:var(--gold)}
+.lede{font-size:clamp(18px,2.4vw,21px);color:var(--muted);max-width:760px;margin:0}
+.byline{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--ink)}
+.chip b{color:var(--gold);font-weight:700}
+section{padding:56px 0;border-bottom:1px solid var(--line)}
+h2{font-size:clamp(24px,3.4vw,32px);margin:0 0 8px}
+h2 small{display:block;color:var(--gold);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+p{margin:12px 0}
+.muted{color:var(--muted)}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 20px 16px}
+.card h3{margin:0 0 10px;font-size:19px}
+.card dl{margin:0}
+.card dt{color:var(--gold);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-top:10px}
+.card dd{margin:2px 0 0;color:var(--ink)}
+.fail{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:20px}
+.fail div{background:var(--panel);border-left:3px solid var(--red);border-radius:8px;padding:12px 14px}
+.fail b{display:block}
+figure{margin:28px 0 8px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;overflow:hidden}
+figure svg{width:100%;height:auto;display:block}
+figcaption{color:var(--muted);font-size:14px;margin-top:10px}
+.layers{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:18px}
+.layers div{background:var(--panel2);border-radius:10px;padding:12px 14px}
+.layers b{color:var(--gold)}
+.stats{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:24px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.stat strong{display:block;font-size:30px;color:var(--gold);line-height:1.1}
+.stat span{font-size:14px;color:var(--muted)}
+.result{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:22px}
+.result .big{font-size:48px;font-weight:800;color:var(--gold);line-height:1}
+.result p{flex:1 1 320px;margin:0}
+ul.clean{padding-left:20px;margin:12px 0}
+ul.clean li{margin:6px 0}
+.omit{columns:2 260px;column-gap:28px;padding-left:20px}
+.omit li{margin:4px 0;break-inside:avoid}
+footer{padding:48px 0 64px;color:var(--muted)}
+footer .contact{color:var(--ink);font-size:18px;margin-top:10px}
+@media (min-width:760px){.layers{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(6,1fr)}.grid .card.wide{grid-column:1/-1}}
+@media (max-width:700px){figure{overflow-x:auto;-webkit-overflow-scrolling:touch}figure svg{min-width:760px}figure:after{content:'Swipe to see the full diagram';display:block;color:#a9bccf;font-size:13px;margin-top:6px}}
+@media (max-width:520px){body{font-size:16px}header.hero{padding:48px 0 36px}section{padding:44px 0}.result .big{font-size:40px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Case study · S24DeFi Labs</div>
+    <h1>algo_bot: an autonomous trading platform that's <span>safe by default</span>, and built so it can't fool itself.</h1>
+    <p class="lede">Most trading bots fail quietly: a backtest that was luck, a bug that peeked at the future, fees nobody modeled, automation with no brakes. We built a platform whose first job is to refuse all of that, and whose second job is to trade.</p>
+    <div class="byline">
+      <span class="chip"><b>Andre Spencer</b> · Lead engineer</span>
+      <span class="chip">Built under S24DeFi Labs · Nov 2025 to present</span>
+      <span class="chip">Python · FastAPI · Docker</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="why">
+  <div class="wrap">
+    <h2><small>Why we built it</small>Fast to build, just as fast to fool yourself</h2>
+    <p>Retail algorithmic trading has four classic failure modes, and AI coding agents make most of them easier to commit. An agent can write a strategy, a backtest and a dashboard in an afternoon. It can also hand you a beautiful equity curve that is pure overfitting.</p>
+    <div class="fail">
+      <div><b>Overfit backtests</b><span class="muted">Try enough ideas and one will look brilliant by chance.</span></div>
+      <div><b>Lookahead leaks</b><span class="muted">One misaligned index and the model is reading tomorrow's paper.</span></div>
+      <div><b>Fees and slippage</b><span class="muted">Edges that exist only at zero cost.</span></div>
+      <div><b>Automation with no brakes</b><span class="muted">A loop that keeps trading after it should have stopped.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <h2><small>What it solves</small>Built so nothing reaches capital without earning it</h2>
+    <p>algo_bot is two systems sharing one codebase. The <b>trading path</b> runs strategies across six broker integrations with several independent risk limits, and it defaults to doing nothing: paper or testnet execution unless someone deliberately switches on live trading. The <b>research path</b> is built to decide whether any idea deserves to go live, using a statistical bar that rises with every idea we try.</p>
+    <p class="muted">The design principle across both: when in doubt, the system stops, records why, and waits for a human.</p>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <h2><small>Architecture</small>The trading path</h2>
+    <figure>
+      <svg viewBox="0 0 960 330" role="img" aria-labelledby="archT archD" xmlns="http://www.w3.org/2000/svg">
+        <title id="archT">Trading path architecture</title>
+        <desc id="archD">Market data flows into signals and strategies, then a risk layer, then execution through a broker factory, then an append-only audit and trade ledger. A command center and observability stack watch every stage, and a kill switch can stop risk and execution.</desc>
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#e6b85c"/></marker></defs>
+        <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" text-anchor="middle">
+          <g fill="#132c47" stroke="#22415f" stroke-width="1.5">
+            <rect x="10" y="40" width="160" height="96" rx="12"/>
+            <rect x="200" y="40" width="160" height="96" rx="12"/>
+            <rect x="390" y="40" width="160" height="96" rx="12" stroke="#e6b85c"/>
+            <rect x="580" y="40" width="160" height="96" rx="12"/>
+            <rect x="770" y="40" width="180" height="96" rx="12"/>
+          </g>
+          <g fill="#eef4fa" font-size="17" font-weight="700">
+            <text x="90" y="80">Market data</text>
+            <text x="280" y="80">Signals</text>
+            <text x="470" y="80">Risk layer</text>
+            <text x="660" y="80">Execution</text>
+            <text x="860" y="80">Ledger + audit</text>
+          </g>
+          <g fill="#a9bccf" font-size="13">
+            <text x="90" y="104">brokers, history,</text><text x="90" y="121">market calendars</text>
+            <text x="280" y="104">strategies, regime,</text><text x="280" y="121">optional LLM score</text>
+            <text x="470" y="104">limits, order safety,</text><text x="470" y="121">drawdown tiers</text>
+            <text x="660" y="104">broker factory,</text><text x="660" y="121">fees + slippage</text>
+            <text x="860" y="104">append-only,</text><text x="860" y="121">hash-chained</text>
+          </g>
+          <g stroke="#e6b85c" stroke-width="2" marker-end="url(#ar)">
+            <line x1="172" y1="88" x2="196" y2="88"/><line x1="362" y1="88" x2="386" y2="88"/>
+            <line x1="552" y1="88" x2="576" y2="88"/><line x1="742" y1="88" x2="766" y2="88"/>
+          </g>
+          <rect x="390" y="196" width="160" height="56" rx="10" fill="#3a1f24" stroke="#ef6a5e" stroke-width="1.5"/>
+          <text x="470" y="221" fill="#eef4fa" font-size="16" font-weight="700">Kill switch</text>
+          <text x="470" y="240" fill="#f3b3ab" font-size="13">4 separate triggers</text>
+          <g stroke="#ef6a5e" stroke-width="2" marker-end="url(#ar)" fill="none">
+            <path d="M470,194 L470,140"/><path d="M552,224 L660,224 L660,140"/>
+          </g>
+          <rect x="10" y="276" width="940" height="44" rx="10" fill="#10243a" stroke="#22415f" stroke-width="1.5"/>
+          <text x="480" y="304" fill="#a9bccf" font-size="14">Command center (token-protected) · Prometheus · Grafana · Alertmanager · Slack and pager alerts</text>
+        </g>
+      </svg>
+      <figcaption>Risk decisions, execution and safety events write to the audit trail. The kill switch sits outside the strategy code, so a misbehaving strategy cannot override it.</figcaption>
+    </figure>
+    <div class="layers">
+      <div><b>Runtime.</b> Python 3.11 services in a six-container Docker Compose stack: trading engine, FastAPI and WebSocket command center, an analytics dashboard, Prometheus, Alertmanager and Grafana.</div>
+      <div><b>Brokers.</b> Five venue integrations across crypto, US equities and FX (four with a live path), plus a paper broker, behind one factory interface, with per-broker circuit breakers and cross-exchange position reconciliation.</div>
+      <div><b>Risk.</b> Per-trade, total open-risk, daily-loss and losing-streak limits; order rate, size and duplicate checks; and a graduated drawdown response that shrinks, then flattens and halts.</div>
+      <div><b>Audit.</b> Kill-switch events from the operator tool and the risk engine, risk blocks, overrides and manual resets land in an append-only store that refuses updates and deletes. Risk decisions are hash-chained, so tampering shows.</div>
+    </div>
+  </div>
+</section>
+
+<section id="highlights">
+  <div class="wrap">
+    <h2><small>Engineering highlights</small>Seven decisions, and the failure each one prevents</h2>
+    <div class="grid">
+      <div class="card"><h3>1. Live trading is opt-in, several times over</h3><dl>
+        <dt>Problem</dt><dd>One wrong config flag should never put real money at risk.</dd>
+        <dt>Built</dt><dd>Paper and testnet by default, and no broker places a live order without an explicit setting. On the equities path, going live also takes a same-day confirmation file, an optional typed confirmation and a paper-trading qualification with six pass criteria; any override is recorded.</dd>
+        <dt>Result</dt><dd>The safe state is the one you get by doing nothing.</dd></dl></div>
+      <div class="card"><h3>2. A kill switch with four separate paths</h3><dl>
+        <dt>Problem</dt><dd>If the only off switch runs inside the broken part, you can't turn it off.</dd>
+        <dt>Built</dt><dd>File, environment, automatic (loss limits and safety trips) and a command-center call. Any one of them halts trading, and switches made through the software are logged.</dd>
+        <dt>Result</dt><dd>There's more than one way to stop it, and none of them depends on a strategy behaving.</dd></dl></div>
+      <div class="card"><h3>3. A bar that rises with every idea tried</h3><dl>
+        <dt>Problem</dt><dd>Test enough strategies and the best one looks good by luck.</dd>
+        <dt>Built</dt><dd>A permanent trial ledger and a Deflated Sharpe test. Rejected ideas keep counting, so each new candidate must beat the expected best result of all the noise we've already tried.</dd>
+        <dt>Result</dt><dd>The test refused the strongest result on record, and we agree with it.</dd></dl></div>
+      <div class="card"><h3>4. A lookahead guard that caught a real leak</h3><dl>
+        <dt>Problem</dt><dd>Future data leaking into a signal is the classic backtest lie, and it's easy to miss in review.</dd>
+        <dt>Built</dt><dd>A contract test that re-scores truncated history and demands identical results, run before any evaluation counts.</dd>
+        <dt>Result</dt><dd>It rejected a first implementation that derived an input from the data it was scoring. The fix made that input independent of the scored data.</dd></dl></div>
+      <div class="card"><h3>5. Forensics where the majority was wrong</h3><dl>
+        <dt>Problem</dt><dd>The trade ledger mixed 1,392 rows from a retired replay path with 301 live paper trades. "Most common equals normal" flagged the genuine trades as the anomaly.</dd>
+        <dt>Built</dt><dd>Signature-based cohort scoring and a reversible quarantine keyed on how each row was written, with dry-run, snapshot and a single transaction.</dd>
+        <dt>Result</dt><dd>Zero misclassified rows, nothing deleted, and an honest baseline recovered.</dd></dl></div>
+      <div class="card"><h3>6. AI agents, with the rules written in code</h3><dl>
+        <dt>Problem</dt><dd>AI agents write a lot of this codebase. Agents that can merge anything eventually will.</dd>
+        <dt>Built</dt><dd>Separate roles for implementer, adversarial reviewer and independent merge reviewer; a strict human authorization grammar where anything else means no; and protected paths that can't merge without an independent review posted by a dedicated, main-branch-only identity.</dd>
+        <dt>Result</dt><dd>Several agents work in one repo, and every protected change needs a second, independent review.</dd></dl></div>
+      <div class="card wide"><h3>7. An LLM in the loop that has to earn its vote</h3><dl>
+        <dt>Problem</dt><dd>"Ask an LLM if this trade is good" is easy to build and impossible to trust by default.</dd>
+        <dt>Built</dt><dd>An optional LLM scoring layer, off by default and log-only: it records an opinion on each signal but blocks nothing until the data shows it predicts outcomes. If it fails, the loop carries on unaffected.</dd>
+        <dt>Result</dt><dd>As shipped, the score is only recorded. It blocks nothing, and if it fails, trading carries on.</dd></dl></div>
+    </div>
+  </div>
+</section>
+
+<section id="research">
+  <div class="wrap">
+    <h2><small>Research rigor</small>How an idea earns the right to trade</h2>
+    <figure>
+      <svg viewBox="0 0 960 250" role="img" aria-labelledby="rsT rsD" xmlns="http://www.w3.org/2000/svg">
+        <title id="rsT">Research pipeline</title>
+        <desc id="rsD">An idea passes through pre-registration, adversarial review, return-free preflight, the lookahead guard, walk-forward out-of-sample testing and the Deflated Sharpe test. Failures at the early stages cost no ledger trials; every failure is recorded.</desc>
+        <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#e6b85c"/></marker></defs>
+        <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" text-anchor="middle">
+          <g fill="#132c47" stroke="#22415f" stroke-width="1.5">
+            <rect x="6" y="30" width="138" height="90" rx="12"/><rect x="164" y="30" width="138" height="90" rx="12"/>
+            <rect x="322" y="30" width="138" height="90" rx="12"/><rect x="480" y="30" width="138" height="90" rx="12"/>
+            <rect x="638" y="30" width="138" height="90" rx="12"/><rect x="796" y="30" width="158" height="90" rx="12" stroke="#e6b85c"/>
+          </g>
+          <g fill="#eef4fa" font-size="15" font-weight="700">
+            <text x="75" y="68">Pre-register</text><text x="233" y="68">Adversarial</text><text x="391" y="68">Return-free</text>
+            <text x="549" y="68">Lookahead</text><text x="707" y="68">Walk-forward</text><text x="875" y="68">Deflated</text>
+          </g>
+          <g fill="#eef4fa" font-size="15" font-weight="700">
+            <text x="233" y="86">review</text><text x="391" y="86">preflight</text><text x="549" y="86">guard</text><text x="707" y="86">out-of-sample</text><text x="875" y="86">Sharpe test</text>
+          </g>
+          <g fill="#a9bccf" font-size="12">
+            <text x="75" y="88">hypothesis, sign,</text><text x="75" y="104">horizon, prior</text>
+            <text x="233" y="106">attack the claim</text><text x="391" y="106">kill for $0</text>
+            <text x="549" y="106">no future data</text><text x="707" y="106">frozen, no fitting</text><text x="875" y="106">bar rises per trial</text>
+          </g>
+          <g stroke="#e6b85c" stroke-width="2" marker-end="url(#ar2)">
+            <line x1="146" y1="75" x2="160" y2="75"/><line x1="304" y1="75" x2="318" y2="75"/><line x1="462" y1="75" x2="476" y2="75"/>
+            <line x1="620" y1="75" x2="634" y2="75"/><line x1="778" y1="75" x2="792" y2="75"/>
+          </g>
+          <rect x="6" y="160" width="454" height="70" rx="10" fill="#10243a" stroke="#22415f"/>
+          <text x="233" y="190" fill="#eef4fa" font-size="15" font-weight="700">Cheap kills</text>
+          <text x="233" y="211" fill="#a9bccf" font-size="13">No returns loaded. No ledger trial spent.</text>
+          <rect x="480" y="160" width="474" height="70" rx="10" fill="#10243a" stroke="#22415f"/>
+          <text x="717" y="190" fill="#eef4fa" font-size="15" font-weight="700">Counted trials</text>
+          <text x="717" y="211" fill="#a9bccf" font-size="13">Every run is charged to a permanent ledger. Nothing is deleted.</text>
+        </g>
+      </svg>
+      <figcaption>Each step needs an explicit, written human authorization. Agents can propose, attack and implement, but they can't spend a trial or ship a strategy on their own.</figcaption>
+    </figure>
+    <ul class="clean">
+      <li><b>Pre-registration.</b> Hypothesis, expected sign, one test horizon and a published prior are committed before any data is touched.</li>
+      <li><b>Return-free preflight.</b> Data provenance, overlap with ideas already killed, coverage and a statistical-power check, each with a kill line written in advance.</li>
+      <li><b>Cheap kills first.</b> At least five ideas were stopped before spending a single counted trial.</li>
+      <li><b>One trial means one trial.</b> No quiet sensitivity runs and no re-tries under a new name. A changed idea is a new registration.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <h2><small>Honest results</small>Saying no is the product</h2>
+    <div class="result">
+      <div class="big">0 / 32</div>
+      <p>evaluations certified for capital so far. That includes a candidate that was positive in every out-of-sample fold and about three times stronger than anything before it, and still failed the deflated bar once every earlier trial was counted. In our own written analysis, the bar now sits above every effect we've found but one, and that one still failed. We kept it there rather than lower it after the fact.</p>
+    </div>
+    <p class="muted">The system would rather report nothing than report luck. We make no claims of returns or profitability.</p>
+  </div>
+</section>
+
+<section id="numbers">
+  <div class="wrap">
+    <h2><small>By the numbers</small>Built like production software</h2>
+    <div class="stats">
+      <div class="stat"><strong>~180K</strong><span>lines of Python</span></div>
+      <div class="stat"><strong>5,100+</strong><span>automated tests</span></div>
+      <div class="stat"><strong>88%</strong><span>coverage floor in CI</span></div>
+      <div class="stat"><strong>12</strong><span>GitHub Actions workflows</span></div>
+      <div class="stat"><strong>560+</strong><span>merged pull requests</span></div>
+      <div class="stat"><strong>6</strong><span>broker integrations</span></div>
+    </div>
+    <p class="muted" style="margin-top:18px">Plus lint and format checks, a dependency vulnerability audit that fails on any finding, pre-commit hooks that block private keys and env files, a changelog requirement on every PR, and a daily data-verification job.</p>
+  </div>
+</section>
+
+<section id="next">
+  <div class="wrap">
+    <h2><small>What's next</small>Raise the evidence, not lower the bar</h2>
+    <p>The next step is a prospective-only test: future candidates are judged on data that didn't exist when they were registered, so no past result can be rescued by a rule change. On the engineering side, the priority is fewer features, finished properly: finishing the path from research verdict to paper deployment before adding anything new.</p>
+  </div>
+</section>
+
+<section id="omitted">
+  <div class="wrap">
+    <h2><small>By design</small>What this page leaves out</h2>
+    <p>The code is private. This case study describes the architecture and the engineering decisions, not the means to reproduce them. Intentionally omitted:</p>
+    <ul class="omit">
+      <li>strategy logic and parameters</li>
+      <li>research ideas, constructions and thresholds</li>
+      <li>risk, fee and drawdown settings</li>
+      <li>symbols, data sources and vendors</li>
+      <li>prompts and model configuration</li>
+      <li>infrastructure identifiers and secrets</li>
+      <li>performance, P&amp;L and account data</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>A live walkthrough of the codebase is available on request.</p>
+    <p class="contact"><b>Andre Spencer</b> · Senior Full-Stack Engineer</p>
+    <p><a href="https://andre.s24defi.com">andre.s24defi.com</a> · <a href="https://resume.s24defi.com">resume.s24defi.com</a> · <a href="mailto:andrespencer.dev@gmail.com">andrespencer.dev@gmail.com</a></p>
+    <p style="font-size:14px">© 2026 S24DeFi Labs. All rights reserved. algo_bot is experimental research software; nothing here is investment advice.</p>
+  </div>
+</footer>
+</body>
+</html>

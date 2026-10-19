@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="1000" height="400" role="img" aria-labelledby="t d" style="background:#0b1a2b">
+  <title id="t">algo_bot system map</title>
+  <desc id="d">Four areas of the platform: the trading engine, control and observability, the research workbench, and delivery and quality checks.</desc>
+  <rect width="1000" height="400" rx="16" fill="#0b1a2b"/>
+  <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif">
+    <g fill="#10243a" stroke="#22415f" stroke-width="1.5">
+      <rect x="20" y="20" width="470" height="170" rx="14"/><rect x="510" y="20" width="470" height="170" rx="14"/>
+      <rect x="20" y="210" width="470" height="170" rx="14"/><rect x="510" y="210" width="470" height="170" rx="14"/>
+    </g>
+    <g fill="#e6b85c" font-size="13" font-weight="700" letter-spacing="1.8">
+      <text x="44" y="52">TRADING ENGINE</text><text x="534" y="52">CONTROL + OBSERVABILITY</text>
+      <text x="44" y="242">RESEARCH WORKBENCH</text><text x="534" y="242">DELIVERY + QUALITY</text>
+    </g>
+    <g fill="#eef4fa" font-size="16">
+      <text x="44" y="84">Live loop and strategy runner</text>
+      <text x="44" y="110">Broker factory, 6 integrations, circuit breakers</text>
+      <text x="44" y="136">Risk limits, order safety, drawdown response</text>
+      <text x="44" y="162">Trade ledger and append-only safety audit</text>
+      <text x="534" y="84">FastAPI + WebSocket command center</text>
+      <text x="534" y="110">Kill switch with four separate triggers</text>
+      <text x="534" y="136">Prometheus, Grafana, Alertmanager</text>
+      <text x="534" y="162">Slack and pager alert routing</text>
+      <text x="44" y="274">Pre-registered intake and trial ledger</text>
+      <text x="44" y="300">Lookahead guard and walk-forward testing</text>
+      <text x="44" y="326">Deflated Sharpe test, bar rises per trial</text>
+      <text x="44" y="352">Ledger forensics and reversible quarantine</text>
+      <text x="534" y="274">5,100+ tests, 88% coverage floor in CI</text>
+      <text x="534" y="300">12 GitHub Actions workflows</text>
+      <text x="534" y="326">Protected paths need an independent review</text>
+      <text x="534" y="352">Dependency audit, secret-blocking hooks</text>
+    </g>
+  </g>
+</svg>
