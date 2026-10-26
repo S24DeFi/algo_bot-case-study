@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>algo_bot case study · S24DeFi Labs</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta name="description" content="How we built an autonomous trading platform that is safe by default and engineered so it can't fool itself. Architecture, safety design and research rigor, without the code.">
 <meta property="og:title" content="algo_bot: safe by default, built so it can't fool itself">
 <meta property="og:description" content="Case study of an autonomous trading platform built under S24DeFi Labs: separate safety stops, a research bar that rises with every idea tried, and AI agents working under rules written in code.">
@@ -16,11 +17,18 @@
   --ink:#eef4fa; --muted:#a9bccf; --gold:#e6b85c; --green:#61c454; --red:#ef6a5e;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4.75rem}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif;font-variant-ligatures:none}
 a{color:var(--gold)}
 a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+.nav{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px solid var(--line);padding:6px 0}
+.nav .wrap{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:2px;list-style:none}
+.nav li{display:flex}
+.nav a{display:inline-flex;align-items:center;justify-content:center;min-width:24px;min-height:24px;padding:4px 2px;border-radius:6px;color:var(--muted);font-size:14px;font-weight:700;line-height:1.2;text-decoration:none}
+.nav a:hover{color:var(--gold)}
+.nav a:focus-visible{outline:2px solid var(--gold);outline-offset:2px;background:var(--panel);color:var(--ink)}
+.nav a[aria-current="true"]{color:var(--gold);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:0.28em}
 header.hero{padding:72px 0 48px;border-bottom:1px solid var(--line);background:radial-gradient(1200px 400px at 80% -10%,#173a5c 0,transparent 60%)}
 .kicker{color:var(--gold);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px}
 h1{font-size:clamp(32px,6vw,54px);line-height:1.08;margin:14px 0 18px;letter-spacing:-.01em}
@@ -44,7 +52,7 @@ p{margin:12px 0}
 .fail div{background:var(--panel);border-left:3px solid var(--red);border-radius:8px;padding:12px 14px}
 .fail b{display:block}
 figure{margin:28px 0 8px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;overflow:hidden}
-figure svg{width:100%;height:auto;display:block}
+figure img{width:100%;height:auto;display:block}
 figcaption{color:var(--muted);font-size:14px;margin-top:10px}
 .layers{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:18px}
 .layers div{background:var(--panel2);border-radius:10px;padding:12px 14px}
@@ -63,11 +71,29 @@ ul.clean li{margin:6px 0}
 footer{padding:48px 0 64px;color:var(--muted)}
 footer .contact{color:var(--ink);font-size:18px;margin-top:10px}
 @media (min-width:760px){.layers{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(6,1fr)}.grid .card.wide{grid-column:1/-1}}
-@media (max-width:700px){figure{overflow-x:auto;-webkit-overflow-scrolling:touch}figure svg{min-width:760px}figure:after{content:'Swipe to see the full diagram';display:block;color:#a9bccf;font-size:13px;margin-top:6px}}
-@media (max-width:520px){body{font-size:16px}header.hero{padding:48px 0 36px}section{padding:44px 0}.result .big{font-size:40px}}
+@media (max-width:700px){figure{overflow-x:auto;-webkit-overflow-scrolling:touch}figure img{min-width:760px}figure:after{content:'Swipe to see the full diagram';display:block;color:#a9bccf;font-size:13px;margin-top:6px}}
+@media (max-width:520px){body{font-size:16px}html{scroll-padding-top:8.5rem}header.hero{padding:48px 0 36px}section{padding:44px 0}.result .big{font-size:40px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media (forced-colors:active){
+  .nav a:focus-visible,.nav a[aria-current="true"]{outline:2px solid Highlight;background:Canvas;color:LinkText;forced-color-adjust:none}
+}
 </style>
 </head>
 <body>
+<nav class="nav" aria-label="Page sections">
+  <ul class="wrap">
+    <li><a href="#why">Why</a></li>
+    <li><a href="#what">What it solves</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#highlights">Decisions</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#map">System map</a></li>
+    <li><a href="#numbers">Numbers</a></li>
+    <li><a href="#next">What's next</a></li>
+    <li><a href="#omitted">Omitted</a></li>
+  </ul>
+</nav>
 
 <header class="hero">
   <div class="wrap">
@@ -108,46 +134,7 @@ footer .contact{color:var(--ink);font-size:18px;margin-top:10px}
   <div class="wrap">
     <h2><small>Architecture</small>The trading path</h2>
     <figure>
-      <svg viewBox="0 0 960 330" role="img" aria-labelledby="archT archD" xmlns="http://www.w3.org/2000/svg">
-        <title id="archT">Trading path architecture</title>
-        <desc id="archD">Market data flows into signals and strategies, then a risk layer, then execution through a broker factory, then an append-only audit and trade ledger. A command center and observability stack watch every stage, and a kill switch can stop risk and execution.</desc>
-        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#e6b85c"/></marker></defs>
-        <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" text-anchor="middle">
-          <g fill="#132c47" stroke="#22415f" stroke-width="1.5">
-            <rect x="10" y="40" width="160" height="96" rx="12"/>
-            <rect x="200" y="40" width="160" height="96" rx="12"/>
-            <rect x="390" y="40" width="160" height="96" rx="12" stroke="#e6b85c"/>
-            <rect x="580" y="40" width="160" height="96" rx="12"/>
-            <rect x="770" y="40" width="180" height="96" rx="12"/>
-          </g>
-          <g fill="#eef4fa" font-size="17" font-weight="700">
-            <text x="90" y="80">Market data</text>
-            <text x="280" y="80">Signals</text>
-            <text x="470" y="80">Risk layer</text>
-            <text x="660" y="80">Execution</text>
-            <text x="860" y="80">Ledger + audit</text>
-          </g>
-          <g fill="#a9bccf" font-size="13">
-            <text x="90" y="104">brokers, history,</text><text x="90" y="121">market calendars</text>
-            <text x="280" y="104">strategies, regime,</text><text x="280" y="121">optional LLM score</text>
-            <text x="470" y="104">limits, order safety,</text><text x="470" y="121">drawdown tiers</text>
-            <text x="660" y="104">broker factory,</text><text x="660" y="121">fees + slippage</text>
-            <text x="860" y="104">append-only,</text><text x="860" y="121">hash-chained</text>
-          </g>
-          <g stroke="#e6b85c" stroke-width="2" marker-end="url(#ar)">
-            <line x1="172" y1="88" x2="196" y2="88"/><line x1="362" y1="88" x2="386" y2="88"/>
-            <line x1="552" y1="88" x2="576" y2="88"/><line x1="742" y1="88" x2="766" y2="88"/>
-          </g>
-          <rect x="390" y="196" width="160" height="56" rx="10" fill="#3a1f24" stroke="#ef6a5e" stroke-width="1.5"/>
-          <text x="470" y="221" fill="#eef4fa" font-size="16" font-weight="700">Kill switch</text>
-          <text x="470" y="240" fill="#f3b3ab" font-size="13">4 separate triggers</text>
-          <g stroke="#ef6a5e" stroke-width="2" marker-end="url(#ar)" fill="none">
-            <path d="M470,194 L470,140"/><path d="M552,224 L660,224 L660,140"/>
-          </g>
-          <rect x="10" y="276" width="940" height="44" rx="10" fill="#10243a" stroke="#22415f" stroke-width="1.5"/>
-          <text x="480" y="304" fill="#a9bccf" font-size="14">Command center (token-protected) · Prometheus · Grafana · Alertmanager · Slack and pager alerts</text>
-        </g>
-      </svg>
+      <img src="assets/architecture.svg" alt="Trading path: market data, signals, risk layer, execution, ledger and audit, with a kill switch over risk and execution, and a command center and observability stack across all stages" width="960" height="330">
       <figcaption>Risk decisions, execution and safety events write to the audit trail. The kill switch sits outside the strategy code, so a misbehaving strategy cannot override it.</figcaption>
     </figure>
     <div class="layers">
@@ -199,40 +186,7 @@ footer .contact{color:var(--ink);font-size:18px;margin-top:10px}
   <div class="wrap">
     <h2><small>Research rigor</small>How an idea earns the right to trade</h2>
     <figure>
-      <svg viewBox="0 0 960 250" role="img" aria-labelledby="rsT rsD" xmlns="http://www.w3.org/2000/svg">
-        <title id="rsT">Research pipeline</title>
-        <desc id="rsD">An idea passes through pre-registration, adversarial review, return-free preflight, the lookahead guard, walk-forward out-of-sample testing and the Deflated Sharpe test. Failures at the early stages cost no ledger trials; every failure is recorded.</desc>
-        <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#e6b85c"/></marker></defs>
-        <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" text-anchor="middle">
-          <g fill="#132c47" stroke="#22415f" stroke-width="1.5">
-            <rect x="6" y="30" width="138" height="90" rx="12"/><rect x="164" y="30" width="138" height="90" rx="12"/>
-            <rect x="322" y="30" width="138" height="90" rx="12"/><rect x="480" y="30" width="138" height="90" rx="12"/>
-            <rect x="638" y="30" width="138" height="90" rx="12"/><rect x="796" y="30" width="158" height="90" rx="12" stroke="#e6b85c"/>
-          </g>
-          <g fill="#eef4fa" font-size="15" font-weight="700">
-            <text x="75" y="68">Pre-register</text><text x="233" y="68">Adversarial</text><text x="391" y="68">Return-free</text>
-            <text x="549" y="68">Lookahead</text><text x="707" y="68">Walk-forward</text><text x="875" y="68">Deflated</text>
-          </g>
-          <g fill="#eef4fa" font-size="15" font-weight="700">
-            <text x="233" y="86">review</text><text x="391" y="86">preflight</text><text x="549" y="86">guard</text><text x="707" y="86">out-of-sample</text><text x="875" y="86">Sharpe test</text>
-          </g>
-          <g fill="#a9bccf" font-size="12">
-            <text x="75" y="88">hypothesis, sign,</text><text x="75" y="104">horizon, prior</text>
-            <text x="233" y="106">attack the claim</text><text x="391" y="106">kill for $0</text>
-            <text x="549" y="106">no future data</text><text x="707" y="106">frozen, no fitting</text><text x="875" y="106">bar rises per trial</text>
-          </g>
-          <g stroke="#e6b85c" stroke-width="2" marker-end="url(#ar2)">
-            <line x1="146" y1="75" x2="160" y2="75"/><line x1="304" y1="75" x2="318" y2="75"/><line x1="462" y1="75" x2="476" y2="75"/>
-            <line x1="620" y1="75" x2="634" y2="75"/><line x1="778" y1="75" x2="792" y2="75"/>
-          </g>
-          <rect x="6" y="160" width="454" height="70" rx="10" fill="#10243a" stroke="#22415f"/>
-          <text x="233" y="190" fill="#eef4fa" font-size="15" font-weight="700">Cheap kills</text>
-          <text x="233" y="211" fill="#a9bccf" font-size="13">No returns loaded. No ledger trial spent.</text>
-          <rect x="480" y="160" width="474" height="70" rx="10" fill="#10243a" stroke="#22415f"/>
-          <text x="717" y="190" fill="#eef4fa" font-size="15" font-weight="700">Counted trials</text>
-          <text x="717" y="211" fill="#a9bccf" font-size="13">Every run is charged to a permanent ledger. Nothing is deleted.</text>
-        </g>
-      </svg>
+      <img src="assets/research-pipeline.svg" alt="Research pipeline: pre-register, adversarial review, return-free preflight, lookahead guard, walk-forward out-of-sample, Deflated Sharpe test" width="960" height="250">
       <figcaption>Each step needs an explicit, written human authorization. Agents can propose, attack and implement, but they can't spend a trial or ship a strategy on their own.</figcaption>
     </figure>
     <ul class="clean">
@@ -252,6 +206,16 @@ footer .contact{color:var(--ink);font-size:18px;margin-top:10px}
       <p>evaluations certified for capital so far. That includes a candidate that was positive in every out-of-sample fold and about three times stronger than anything before it, and still failed the deflated bar once every earlier trial was counted. In our own written analysis, the bar now sits above every effect we've found but one, and that one still failed. We kept it there rather than lower it after the fact.</p>
     </div>
     <p class="muted">The system would rather report nothing than report luck. We make no claims of returns or profitability.</p>
+  </div>
+</section>
+
+<section id="map">
+  <div class="wrap">
+    <h2><small>The whole platform</small>System map</h2>
+    <figure>
+      <img src="assets/system-map.svg" alt="System map: trading engine, control and observability, research workbench, delivery and quality" width="1000" height="400">
+      <figcaption>Trading, control, research, and delivery. The same four areas the rest of this page walks through one at a time.</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -302,5 +266,45 @@ footer .contact{color:var(--ink);font-size:18px;margin-top:10px}
     <p style="font-size:14px">© 2026 S24DeFi Labs. All rights reserved. algo_bot is experimental research software; nothing here is investment advice.</p>
   </div>
 </footer>
+<script>
+(function () {
+  var nav = document.querySelector(".nav");
+  var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+  var sections = links.map(function (link) {
+    return document.getElementById(link.getAttribute("href").slice(1));
+  }).filter(Boolean);
+  if (!sections.length) return;
+  var frame = 0;
+  function update() {
+    frame = 0;
+    var offset = nav.offsetHeight + 12;
+    document.documentElement.style.scrollPaddingTop = offset + "px";
+    var marker = Math.min(window.innerHeight * 0.33, nav.getBoundingClientRect().bottom + 96);
+    var current = sections[0].id;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].getBoundingClientRect().top <= marker) current = sections[i].id;
+    }
+    for (var j = 0; j < links.length; j++) {
+      var on = links[j].getAttribute("href") === "#" + current;
+      if (on) links[j].setAttribute("aria-current", "true");
+      else links[j].removeAttribute("aria-current");
+    }
+  }
+  function requestUpdate() {
+    if (!frame) frame = window.requestAnimationFrame(update);
+  }
+  update();
+  window.addEventListener("scroll", requestUpdate, {passive: true});
+  window.addEventListener("resize", requestUpdate);
+  window.addEventListener("hashchange", function () {
+    requestUpdate();
+    window.setTimeout(requestUpdate, 0);
+  });
+  if ("IntersectionObserver" in window) {
+    var observer = new IntersectionObserver(requestUpdate, {threshold: [0, 0.25]});
+    sections.forEach(function (section) { observer.observe(section); });
+  }
+})();
+</script>
 </body>
 </html>

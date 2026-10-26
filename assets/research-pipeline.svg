@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg style="background:#0b1a2b" viewBox="0 0 960 250" role="img" aria-labelledby="rsT rsD" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" style="background:#0b1a2b" viewBox="0 0 960 250" width="960" height="250" role="img" aria-labelledby="rsT rsD">
         <title id="rsT">Research pipeline</title>
         <desc id="rsD">An idea passes through pre-registration, adversarial review, return-free preflight, the lookahead guard, walk-forward out-of-sample testing and the Deflated Sharpe test. Failures at the early stages cost no ledger trials; every failure is recorded.</desc>
         <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#e6b85c"/></marker></defs>
